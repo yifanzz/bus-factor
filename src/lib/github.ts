@@ -1,11 +1,17 @@
 import { Octokit } from "@octokit/rest"
 
+interface ContributorShare {
+    name: string
+    percentage: number
+}
+
 interface RepoStats {
     busFactor: number
     contributors: number
     commits: number
     issues: number
     isProcessing?: boolean
+    contributorShares: ContributorShare[] // Add this field
 }
 
 export async function getRepoStats(repoFullName: string, accessToken: string): Promise<RepoStats> {
@@ -30,7 +36,8 @@ export async function getRepoStats(repoFullName: string, accessToken: string): P
                 contributors: 0,
                 commits: 0,
                 issues: 0,
-                isProcessing: true
+                isProcessing: true,
+                contributorShares: [] // Add this to fix the linter error
             }
         }
 
@@ -59,12 +66,44 @@ export async function getRepoStats(repoFullName: string, accessToken: string): P
             if (cumulativeShare >= 0.8) break
         }
 
+        const contributorShares: ContributorShare[] = []
+        let othersPercentage = 0
+
+        // Calculate contributor shares
+        contributorsResponse.data?.forEach((contributor) => {
+            const percentage = (contributor.total || 0) / totalCommits
+            if (percentage >= 0.1) { // 10% threshold
+                contributorShares.push({
+                    name: contributor.author?.login || 'Unknown',
+                    percentage: Number((percentage * 100).toFixed(1))
+                })
+            } else {
+                othersPercentage += percentage
+            }
+        })
+
+        // Add "Others" category if there are small contributors
+        if (othersPercentage > 0) {
+            contributorShares.push({
+                name: 'Others',
+                percentage: Number((othersPercentage * 100).toFixed(1))
+            })
+        }
+
+        // Sort by percentage descending
+        contributorShares.sort((a, b) => b.percentage - a.percentage)
+        console.log(`contributorShares: ${JSON.stringify(contributorShares)}`)
+
+        console.log('Raw contributor data:', contributorsResponse.data);
+        console.log('Processed contributor shares:', contributorShares);
+
         return {
             busFactor: busFactor,
             contributors: contributorCount,
             commits: totalCommits,
             issues: issues.length,
-            isProcessing: false
+            isProcessing: false,
+            contributorShares
         }
     } catch (error) {
         console.error('Error fetching repository data:', error)

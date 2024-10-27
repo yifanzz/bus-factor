@@ -1,15 +1,27 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
+
+interface ContributorShare {
+    name: string
+    percentage: number
+}
 
 interface Stats {
     busFactor: number
     contributors: number
     commits: number
     issues: number
+    contributorShares: ContributorShare[]
 }
 
 interface StatsDisplayProps {
     stats: Stats
 }
+
+// Define colors for the pie chart
+const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))']
 
 export function StatsDisplay({ stats }: StatsDisplayProps) {
     const Trendline = ({ trend }: { trend: "up" | "down" | "stable" }) => {
@@ -26,6 +38,11 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
         )
     }
 
+    const pieData = stats.contributorShares.map(share => ({
+        name: share.name,
+        value: share.percentage
+    }))
+
     return (
         <div className="space-y-6">
             <Card className="bg-gradient-to-br from-purple-500 to-indigo-500">
@@ -34,6 +51,35 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
                 </CardHeader>
                 <CardContent>
                     <p className="text-6xl font-bold text-white text-center">{stats.busFactor}/10</p>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Contributor Distribution</CardTitle>
+                </CardHeader>
+                <CardContent className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={pieData}
+                                dataKey="value"
+                                nameKey="name"
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={120}
+                                label={({ name, value }) => `${name} (${value}%)`}
+                            >
+                                {pieData.map((_, index) => (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={COLORS[index % COLORS.length]}
+                                    />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                        </PieChart>
+                    </ResponsiveContainer>
                 </CardContent>
             </Card>
 

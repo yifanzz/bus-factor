@@ -15,6 +15,12 @@ interface AnalysisState {
     retryCount: number
 }
 
+const PRESET_REPOS = [
+    { name: "Sage", repo: "storia-ai/sage" },
+    { name: "LangChainJS", repo: "langchain-ai/langchainjs" },
+    { name: "Dify", repo: "langgenius/dify" },
+]
+
 export function AnalyzeForm() {
     const [repoName, setRepoName] = useState("")
     const [stats, setStats] = useState<null | RepoStats>(null)
@@ -52,6 +58,13 @@ export function AnalyzeForm() {
         }
     }
 
+    function handlePresetSelect(repo: string) {
+        setRepoName(repo)
+        const formData = new FormData()
+        formData.set("repoName", repo)
+        handleAnalysis(formData)
+    }
+
     // Handle retries
     useEffect(() => {
         if (stats?.isProcessing && analysisState.retryCount < 5) {
@@ -82,39 +95,58 @@ export function AnalyzeForm() {
 
     return (
         <>
-            <form action={handleAnalysis} className="mb-8">
-                <div className="flex gap-2">
-                    <Input
-                        name="repoName"
-                        type="text"
-                        value={repoName}
-                        onChange={(e) => setRepoName(e.target.value)}
-                        placeholder="Enter GitHub repository name (e.g., owner/repo)"
-                        className="flex-grow"
-                        disabled={analysisState.isLoading}
-                    />
-                    <Button
-                        type="submit"
-                        disabled={analysisState.isLoading}
-                    >
-                        <GitHubLogoIcon className="mr-2 h-4 w-4" />
-                        {analysisState.isLoading ? "Processing..." : "Analyze"}
-                    </Button>
+            <div className="space-y-4">
+                <div className="flex flex-wrap gap-2 justify-center">
+                    {PRESET_REPOS.map(({ name, repo }) => (
+                        <Button
+                            key={repo}
+                            variant="outline"
+                            onClick={() => handlePresetSelect(repo)}
+                            disabled={analysisState.isLoading}
+                            className="min-w-32"
+                        >
+                            <GitHubLogoIcon className="mr-2 h-4 w-4" />
+                            {name}
+                        </Button>
+                    ))}
                 </div>
-                {getStatusMessage() && (
-                    <p className={cn(
-                        "mt-2 text-sm",
-                        {
-                            "text-yellow-500": getStatusMessage()?.type === "processing",
-                            "text-green-500": getStatusMessage()?.type === "success",
-                            "text-red-500": getStatusMessage()?.type === "error"
-                        }
-                    )}>
-                        {getStatusMessage()?.text}
-                    </p>
-                )}
-            </form>
-            {stats && !stats.isProcessing && <StatsDisplay stats={stats} />}
+
+                <form action={handleAnalysis} className="mb-8">
+                    <div className="flex gap-2">
+                        <Input
+                            name="repoName"
+                            type="text"
+                            value={repoName}
+                            onChange={(e) => setRepoName(e.target.value)}
+                            placeholder="Enter GitHub repository name (e.g., owner/repo)"
+                            className="flex-grow"
+                            disabled={analysisState.isLoading}
+                        />
+                        <Button
+                            type="submit"
+                            disabled={analysisState.isLoading}
+                        >
+                            <GitHubLogoIcon className="mr-2 h-4 w-4" />
+                            {analysisState.isLoading ? "Processing..." : "Analyze"}
+                        </Button>
+                    </div>
+                    {getStatusMessage() && (
+                        <p className={cn(
+                            "mt-2 text-sm",
+                            {
+                                "text-yellow-500": getStatusMessage()?.type === "processing",
+                                "text-green-500": getStatusMessage()?.type === "success",
+                                "text-red-500": getStatusMessage()?.type === "error"
+                            }
+                        )}>
+                            {getStatusMessage()?.text}
+                        </p>
+                    )}
+                </form>
+            </div>
+            {stats && !analysisState.isLoading && (
+                <StatsDisplay stats={stats} />
+            )}
         </>
     )
 }
