@@ -16,7 +16,14 @@ export async function analyzeRepo(formData: FormData) {
     }
 
     try {
-        return await getRepoStats(repoName, session.githubAccessToken)
+        // You can adjust these values based on your needs
+        const config = {
+            minRecentCommits: 5,
+            minCommitPercentage: 2,
+            recentMonths: 3
+        }
+
+        return await getRepoStats(repoName, session.githubAccessToken, config)
     } catch (error) {
         console.error('Error analyzing repository:', error)
         throw new Error("Failed to analyze repository. Please check the repository name and try again.")
