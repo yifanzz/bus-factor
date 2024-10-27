@@ -12,6 +12,7 @@
     "@auth/core": "^0.34.2",
     "@auth/kysely-adapter": "^1.7.2",
     "@hookform/resolvers": "^3.9.0",
+    "@octokit/rest": "^21.0.2",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",

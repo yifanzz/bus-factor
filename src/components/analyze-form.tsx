@@ -13,6 +13,7 @@ interface FormState {
 }
 
 export function AnalyzeForm() {
+    const [repoName, setRepoName] = useState("")
     const [stats, setStats] = useState<null | {
         busFactor: number
         contributors: number
@@ -40,6 +41,8 @@ export function AnalyzeForm() {
                     <Input
                         name="repoName"
                         type="text"
+                        value={repoName}
+                        onChange={(e) => setRepoName(e.target.value)}
                         placeholder="Enter GitHub repository name"
                         className="flex-grow"
                     />

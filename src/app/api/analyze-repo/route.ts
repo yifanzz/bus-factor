@@ -1,24 +1,23 @@
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]/route"
+import { getRepoStats } from "@/lib/github"
 
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions)
-    if (!session || !session.user) {
+    if (!session?.user || !session.githubAccessToken) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { repoName } = await req.json()
-
-    // TODO: Implement actual GitHub API calls using the user's token to analyze the repository
-
-    // For now, return mock data
-    const mockStats = {
-        busFactor: 7,
-        contributors: 42,
-        commits: 1337,
-        issues: 99,
+    try {
+        const { repoName } = await req.json()
+        const stats = await getRepoStats(repoName, session.githubAccessToken)
+        return NextResponse.json(stats)
+    } catch (error) {
+        console.error('Error analyzing repository:', error)
+        return NextResponse.json(
+            { error: "Failed to analyze repository" },
+            { status: 500 }
+        )
     }
-
-    return NextResponse.json(mockStats)
 }

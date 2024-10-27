@@ -2,6 +2,7 @@
 
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { getRepoStats } from "@/lib/github"
 
 export async function analyzeRepo(formData: FormData) {
     const session = await getServerSession(authOptions)
@@ -14,13 +15,10 @@ export async function analyzeRepo(formData: FormData) {
         throw new Error("GitHub token not found")
     }
 
-    // TODO: Implement actual GitHub API calls using session.githubAccessToken to analyze the repository
-
-    // For now, return mock data
-    return {
-        busFactor: 7,
-        contributors: 42,
-        commits: 1337,
-        issues: 99,
+    try {
+        return await getRepoStats(repoName, session.githubAccessToken)
+    } catch (error) {
+        console.error('Error analyzing repository:', error)
+        throw new Error("Failed to analyze repository. Please check the repository name and try again.")
     }
 }
