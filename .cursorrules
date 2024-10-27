@@ -20,6 +20,11 @@
   - Avoid enums; use maps instead.
   - Use functional components with TypeScript interfaces.
   
+  Database
+  - Use Kysely for database queries
+  - Use PostgresDialect for Kysely
+  - Always use migrations to update the database schema
+
   Syntax and Formatting
   - Use the "function" keyword for pure functions.
   - Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
@@ -27,6 +32,7 @@
   
   UI and Styling
   - Use Shadcn UI, Radix, and Tailwind for components and styling.
+  - When adding new shadcn component also print out the command to add it in the output
   - Implement responsive design with Tailwind CSS; use a mobile-first approach.
   
   Performance Optimization
@@ -42,6 +48,8 @@
     - Favor server components and Next.js SSR.
     - Use only for Web API access in small components.
     - Avoid for data fetching or state management.
+  - Use Data Access Layer pattern for database access in components
+  - Use server actions for data fetching and state management in components
   
   Follow Next.js docs for Data Fetching, Rendering, and Routing.
   

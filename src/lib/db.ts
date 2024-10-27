@@ -9,7 +9,7 @@ import type { Database as AuthDatabase } from '@auth/kysely-adapter'
 
 // Extend the AuthDatabase type with our custom fields
 export interface Database extends AuthDatabase {
-    users: AuthDatabase['user'] & {
+    users: AuthDatabase['User'] & {
         githubToken: string | null
     }
 }
