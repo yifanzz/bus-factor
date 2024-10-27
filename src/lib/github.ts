@@ -5,6 +5,7 @@ interface RepoStats {
     contributors: number
     commits: number
     issues: number
+    isProcessing?: boolean
 }
 
 export async function getRepoStats(repoFullName: string, accessToken: string): Promise<RepoStats> {
@@ -17,26 +18,42 @@ export async function getRepoStats(repoFullName: string, accessToken: string): P
 
     try {
         // Fetch data in parallel
-        const [contributors, issues, commits] = await Promise.all([
+        const [contributorsResponse, commitsResponse] = await Promise.all([
             octokit.repos.getContributorsStats({ owner, repo }),
-            octokit.issues.listForRepo({ owner, repo, state: 'open' }),
             octokit.repos.getCommitActivityStats({ owner, repo })
         ])
 
-        // Calculate total commits from contributors
-        const totalCommits = commits.data?.reduce((sum, commitWeek) =>
-            sum + (commitWeek.total || 0), 0) || 0
+        // Check if GitHub is still processing the stats
+        if (contributorsResponse.status === 202 || commitsResponse.status === 202) {
+            return {
+                busFactor: 0,
+                contributors: 0,
+                commits: 0,
+                issues: 0,
+                isProcessing: true
+            }
+        }
 
-        const contributorCount = contributors.data?.length || 0
-        const commitDistribution = contributors.data
+        const [issues, commits] = await Promise.all([
+            octokit.paginate(octokit.issues.listForRepo, { owner, repo, state: 'open', per_page: 100 }),
+            octokit.paginate(octokit.repos.listCommits, { owner, repo, per_page: 100 })
+        ])
+
+        // Calculate total commits from contributors
+        const totalCommits = commits.length
+
+        const contributorCount = contributorsResponse.data?.length || 0
+        const commitDistribution = contributorsResponse.data
             ?.map(c => (c.total || 0) / totalCommits)
             .sort((a, b) => b - a) || []
 
         // Calculate bus factor using commit distribution
         // Consider contributors until we reach 80% of commits
+        console.log(`totalCommits: ${totalCommits}`)
         let cumulativeShare = 0
         let busFactor = 0
         for (const share of commitDistribution) {
+            console.log(`share: ${share}, share * totalCommits: ${share}`)
             cumulativeShare += share
             busFactor++
             if (cumulativeShare >= 0.8) break
@@ -46,7 +63,8 @@ export async function getRepoStats(repoFullName: string, accessToken: string): P
             busFactor: busFactor,
             contributors: contributorCount,
             commits: totalCommits,
-            issues: issues.data.length
+            issues: issues.length,
+            isProcessing: false
         }
     } catch (error) {
         console.error('Error fetching repository data:', error)
