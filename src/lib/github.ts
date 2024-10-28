@@ -1,6 +1,6 @@
 import { Octokit } from "@octokit/rest"
 import { toISOStringWithoutMs } from "@/lib/utils"
-import { ContributorShare, IssueTimeSeries, RepoStats } from "@/types/repo"
+import { RepoStats } from "@/types/repo"
 import { calculateContributorStats, calculateIssueHistory } from "@/lib/github-stats"
 import { CONTRIBUTOR_CONFIG, getAnalysisTimeframe } from "@/lib/config/contributor"
 

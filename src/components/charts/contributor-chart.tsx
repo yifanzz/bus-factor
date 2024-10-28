@@ -20,7 +20,7 @@ export function ContributorChart({ data }: ContributorChartProps) {
                     cx="50%"
                     cy="50%"
                     outerRadius={80}
-                    label={({ name, commits, percentage }) => `${name} (${commits})`}
+                    label={({ name, commits }) => `${name} (${commits})`}
                 >
                     {data.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

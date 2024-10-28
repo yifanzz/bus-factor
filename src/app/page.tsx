@@ -1,6 +1,6 @@
 import { AnalyzeForm } from '@/components/analyze-form'
 import { RecentRepos } from '@/components/recent-repos'
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
 import { CONTENT } from "@/lib/content"
 import { Suspense } from 'react'

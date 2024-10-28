@@ -29,13 +29,13 @@ export async function saveRepoStats(repoName: string, stats: RepoStats): Promise
         .values({
             id: sql`gen_random_uuid()`,
             repo_name: repoName,
-            stats: stats as any,
+            stats: stats as RepoStats,
             calculated_at: new Date()
         })
         .onConflict((oc) =>
             oc.column('repo_name')
                 .doUpdateSet({
-                    stats: stats as any,
+                    stats: stats as RepoStats,
                     calculated_at: new Date()
                 })
         )

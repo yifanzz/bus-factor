@@ -1,7 +1,7 @@
 "use client"
 
 import { IssueTimeSeries } from "@/types/repo"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { LineChart, Line, XAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 
 interface IssueHistoryChartProps {
     data: IssueTimeSeries

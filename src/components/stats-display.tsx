@@ -4,7 +4,7 @@ import { ContributorChart } from "@/components/charts/contributor-chart"
 import { IssueHistoryChart } from "@/components/charts/issue-history-chart"
 import { ContributorShare, IssueTimeSeries } from "@/types/repo"
 import { formatDistanceToNow } from "date-fns"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
 import { CONTENT } from "@/lib/content"
 
@@ -25,9 +25,6 @@ interface StatsDisplayProps {
     stats: Stats
 }
 
-// Define colors for the pie chart
-const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))']
-
 // Add color constants for the traffic light system
 const BUS_FACTOR_COLORS = {
     red: "from-red-500 to-red-600",
@@ -36,20 +33,6 @@ const BUS_FACTOR_COLORS = {
 } as const
 
 export function StatsDisplay({ stats }: StatsDisplayProps) {
-    const Trendline = ({ trend }: { trend: "up" | "down" | "stable" }) => {
-        const d = trend === "up" ? "M0 10 L10 0 L20 5" :
-            trend === "down" ? "M0 0 L10 10 L20 5" :
-                "M0 5 L20 5"
-        const stroke = trend === "up" ? "stroke-green-500" :
-            trend === "down" ? "stroke-red-500" :
-                "stroke-yellow-500"
-        return (
-            <svg className="w-20 h-10">
-                <path d={d} className={`${stroke} fill-none stroke-2`} />
-            </svg>
-        )
-    }
-
     // Helper function to determine background color class
     function getBusFactorColor(factor: number) {
         if (factor === 1) return BUS_FACTOR_COLORS.red
@@ -61,11 +44,6 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
     function getProgressPercentage(factor: number) {
         return Math.min((factor / 10) * 100, 100)
     }
-
-    const pieData = stats.contributorShares.map(share => ({
-        name: share.name,
-        value: share.percentage
-    }))
 
     return (
         <div className="space-y-6">

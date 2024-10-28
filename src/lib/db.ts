@@ -1,8 +1,5 @@
 import { Kysely, PostgresDialect } from 'kysely'
 import { Pool } from 'pg'
-import { promises as fs } from 'fs'
-import { FileMigrationProvider, Migrator } from 'kysely'
-import * as path from 'path'
 
 // Import the Database type from @auth/kysely-adapter
 import type { Database as AuthDatabase } from '@auth/kysely-adapter'

@@ -1,10 +1,18 @@
-import { Octokit } from "@octokit/rest"
 import { ContributorShare, IssueTimeSeries } from "@/types/repo"
-import { toISOStringWithoutMs } from "@/lib/utils"
 import { CONTRIBUTOR_CONFIG, isActiveContributor } from "@/lib/config/contributor"
 
 export async function calculateContributorStats(
-    commits: any[],
+    commits: {
+        commit: {
+            author?: {
+                date: string
+                name: string
+            }
+        },
+        author?: {
+            login: string
+        }
+    }[],
     config = CONTRIBUTOR_CONFIG
 ): Promise<{
     busFactor: number
@@ -31,6 +39,7 @@ export async function calculateContributorStats(
 
     // When creating contributorShares, include the commit count
     const contributorShares: ContributorShare[] = Array.from(authorCommits.entries())
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .filter(([_, count]) => isActiveContributor(count, totalRecentCommits))
         .map(([author, count]) => ({
             name: author,
@@ -63,7 +72,10 @@ export async function calculateContributorStats(
 }
 
 export async function calculateIssueHistory(
-    issues: any[]
+    issues: {
+        created_at: string
+        state: 'open' | 'closed'
+    }[]
 ): Promise<IssueTimeSeries> {
     // Group issues by week
     const openIssuesByWeek = new Map<string, number>()

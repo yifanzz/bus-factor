@@ -1,11 +1,8 @@
 import { StatsDisplay } from "@/components/stats-display"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import { analyzeRepo } from "@/app/actions/analyze-repo"
 import { Button } from "@/components/ui/button"
-import { GitHubLogoIcon, ReloadIcon } from "@radix-ui/react-icons"
+import { GitHubLogoIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { RefreshButton } from "@/components/refresh-button"
 
@@ -14,12 +11,9 @@ interface ReportPageProps {
         owner: string
         repo: string
     }
-    searchParams: {
-        refresh?: string
-    }
 }
 
-export default async function ReportPage({ params, searchParams }: ReportPageProps) {
+export default async function ReportPage({ params }: ReportPageProps) {
     const { owner, repo } = await params
 
     // Get the stats

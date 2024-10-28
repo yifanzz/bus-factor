@@ -11,7 +11,6 @@ export function AnalyzeForm() {
     const [repoName, setRepoName] = useState("")
     const [error, setError] = useState<string>()
     const [isLoading, setIsLoading] = useState(false)
-    const [forceRefresh, setForceRefresh] = useState(false)
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -26,9 +25,10 @@ export function AnalyzeForm() {
 
         setIsLoading(true)
         try {
-            router.push(`/report/${owner}/${repo}${forceRefresh ? "?refresh=true" : ""}`)
+            router.push(`/report/${owner}/${repo}`)
         } catch (error) {
             setError("Failed to analyze repository")
+            console.error(error)
         } finally {
             setIsLoading(false)
         }
@@ -54,19 +54,6 @@ export function AnalyzeForm() {
                             <GitHubLogoIcon className="mr-2 h-4 w-4" />
                             {isLoading ? "Processing..." : "Analyze"}
                         </Button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            id="forceRefresh"
-                            checked={forceRefresh}
-                            onChange={(e) => setForceRefresh(e.target.checked)}
-                            className="h-4 w-4"
-                        />
-                        <label htmlFor="forceRefresh" className="text-sm text-muted-foreground">
-                            Force refresh (ignore cache)
-                        </label>
                     </div>
 
                     {error && (
