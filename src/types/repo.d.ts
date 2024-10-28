@@ -3,13 +3,24 @@ export interface ContributorShare {
     percentage: number
 }
 
+export interface TimeSeriesPoint {
+    date: string
+    value: number
+}
+
+export interface IssueTimeSeries {
+    openIssues: TimeSeriesPoint[]
+    closedIssues: TimeSeriesPoint[]
+}
+
 export interface RepoStats {
     busFactor: number
     contributors: number
     commits: number
-    openIssues: number    // Rename from issues
-    closedIssues: number  // Add this field
+    openIssues: number
+    closedIssues: number
     isProcessing?: boolean
     contributorShares: ContributorShare[]
     analyzedMonths: number
+    issueHistory: IssueTimeSeries
 }

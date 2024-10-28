@@ -1,12 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Suspense } from "react"
 import { ContributorChart } from "@/components/charts/contributor-chart"
+import { IssueHistoryChart } from "@/components/charts/issue-history-chart"
+import { ContributorShare, IssueTimeSeries } from "@/types/repo"
 
-
-interface ContributorShare {
-    name: string
-    percentage: number
-}
 
 interface Stats {
     busFactor: number
@@ -16,6 +13,7 @@ interface Stats {
     closedIssues: number
     contributorShares: ContributorShare[]
     analyzedMonths: number
+    issueHistory: IssueTimeSeries
 }
 
 interface StatsDisplayProps {
@@ -163,6 +161,17 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
                 <CardContent>
                     <Suspense fallback={<div className="h-[300px] animate-pulse bg-muted" />}>
                         <ContributorChart data={stats.contributorShares} />
+                    </Suspense>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Issues Over Time</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Suspense fallback={<div className="h-[300px] animate-pulse bg-muted" />}>
+                        <IssueHistoryChart data={stats.issueHistory} />
                     </Suspense>
                 </CardContent>
             </Card>

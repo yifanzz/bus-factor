@@ -7,7 +7,7 @@ import { getRepoStats, saveRepoStats } from "@/lib/repo-stats-dal"
 
 const CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
-export async function analyzeRepo(repoName: string, forceRefresh = false) {
+export async function analyzeRepo(repoName: string, forceRefresh = true) {
     console.log(`Analyzing ${repoName} with forceRefresh=${forceRefresh}`)
     const session = await getServerSession(authOptions)
     if (!session?.user) {

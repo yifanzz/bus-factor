@@ -11,9 +11,12 @@ interface ReportPageProps {
         owner: string
         repo: string
     }>
+    searchParams: {
+        refresh?: string
+    }
 }
 
-export default async function ReportPage({ params }: ReportPageProps) {
+export default async function ReportPage({ params, searchParams }: ReportPageProps) {
     const { owner, repo } = await params
     const session = await getServerSession(authOptions)
 
@@ -21,7 +24,11 @@ export default async function ReportPage({ params }: ReportPageProps) {
         redirect("/")
     }
 
-    const stats = await analyzeRepo(`${owner}/${repo}`)
+    // Convert the refresh param to boolean
+    const { refreshParam } = await searchParams
+    const forceRefresh = refreshParam === 'true'
+
+    const stats = await analyzeRepo(`${owner}/${repo}`, forceRefresh)
 
     return (
         <main className="min-h-screen bg-background">

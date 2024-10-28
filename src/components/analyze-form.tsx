@@ -32,7 +32,7 @@ export function AnalyzeForm() {
 
         setIsLoading(true)
         try {
-            router.push(`/report/${owner}/${repo}`)
+            router.push(`/report/${owner}/${repo}?refresh=${forceRefresh}`)
         } catch (error) {
             setError("Failed to analyze repository")
         } finally {
@@ -43,7 +43,7 @@ export function AnalyzeForm() {
     function handlePresetSelect(repo: string) {
         const [owner, repoName] = repo.split('/')
         if (owner && repoName) {
-            router.push(`/report/${owner}/${repoName}`)
+            router.push(`/report/${owner}/${repoName}?refresh=${forceRefresh}`)
         }
     }
 
