@@ -20,6 +20,7 @@ export interface RepoStats {
     commits: number
     openIssues: number
     closedIssues: number
+    stars: number // Add this line
     isProcessing?: boolean
     contributorShares: ContributorShare[]
     analyzedMonths: number

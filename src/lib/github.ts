@@ -63,6 +63,12 @@ export async function getRepoStats(
             calculateIssueHistory([...openIssues, ...closedIssues])
         ])
 
+        // Get repository info including stars
+        const { data: repoData } = await octokit.repos.get({
+            owner,
+            repo,
+        })
+
         return {
             ...contributorStats,
             commits: commits.length,
@@ -70,6 +76,7 @@ export async function getRepoStats(
             closedIssues: closedIssues.length,
             isProcessing: false,
             analyzedMonths: contributorConfig.recentMonths,
+            stars: repoData.stargazers_count,
             issueHistory
         }
     } catch (error) {

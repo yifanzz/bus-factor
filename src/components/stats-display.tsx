@@ -15,6 +15,7 @@ interface Stats {
     analyzedMonths: number
     issueHistory: IssueTimeSeries
     calculatedAt?: Date
+    stars: number
 }
 
 interface StatsDisplayProps {
@@ -78,6 +79,9 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
         <div className="space-y-6">
             {/* Analysis Period Notice */}
             <div className="text-center space-y-1">
+                <p className="text-sm">
+                    ⭐ {stats.stars} stars
+                </p>
                 <p className="text-sm text-muted-foreground">
                     This analysis is based on repository activity in the last {stats.analyzedMonths} months
                 </p>

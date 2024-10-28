@@ -1,6 +1,7 @@
 import { getRecentRepos } from "@/app/actions/get-recent-repos"
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
+import { StarIcon } from "@radix-ui/react-icons"
 
 // Add color constants for the traffic light system
 const BUS_FACTOR_COLORS = {
@@ -39,8 +40,14 @@ export async function RecentRepos() {
                                     {new Date(calculatedAt).toLocaleDateString()}
                                 </span>
                             </div>
-                            <div className={`${getBusFactorColor(stats.busFactor)} text-white font-bold px-4 py-2 rounded-md`}>
-                                {stats.busFactor}
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-1">
+                                    <StarIcon className="h-4 w-4" />
+                                    <span>{stats.stars}</span>
+                                </div>
+                                <div className={`${getBusFactorColor(stats.busFactor)} text-white font-bold px-4 py-2 rounded-md`}>
+                                    {stats.busFactor}
+                                </div>
                             </div>
                         </Card>
                     </Link>
