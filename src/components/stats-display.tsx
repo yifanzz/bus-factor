@@ -12,9 +12,10 @@ interface Stats {
     busFactor: number
     contributors: number
     commits: number
-    issues: number
+    openIssues: number
+    closedIssues: number
     contributorShares: ContributorShare[]
-    analyzedMonths: number  // Add this field
+    analyzedMonths: number
 }
 
 interface StatsDisplayProps {
@@ -137,11 +138,20 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">Open Issues</CardTitle>
+                        <CardTitle className="text-lg">Issues</CardTitle>
                     </CardHeader>
                     <CardContent className="flex justify-between items-center">
-                        <span className="text-2xl font-semibold">{stats.issues}</span>
-                        <Trendline trend="down" />
+                        <div className="flex flex-col">
+                            <span className="text-2xl font-semibold">
+                                {stats.openIssues}/{stats.closedIssues}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                                Open/Closed
+                            </span>
+                        </div>
+                        <Trendline
+                            trend={stats.openIssues > stats.closedIssues ? "up" : "down"}
+                        />
                     </CardContent>
                 </Card>
             </div>

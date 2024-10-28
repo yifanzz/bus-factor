@@ -7,8 +7,9 @@ export interface RepoStats {
     busFactor: number
     contributors: number
     commits: number
-    issues: number
+    openIssues: number    // Rename from issues
+    closedIssues: number  // Add this field
     isProcessing?: boolean
     contributorShares: ContributorShare[]
-    analyzedMonths: number  // Add this field
+    analyzedMonths: number
 }

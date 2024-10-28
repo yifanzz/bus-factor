@@ -1,4 +1,5 @@
 import { Octokit } from "@octokit/rest"
+import { toISOStringWithoutMs } from "@/lib/utils"
 
 interface ContributorConfig {
     minRecentCommits: number      // Minimum number of commits in recent period
@@ -7,8 +8,8 @@ interface ContributorConfig {
 }
 
 const DEFAULT_CONTRIBUTOR_CONFIG: ContributorConfig = {
-    minRecentCommits: 5,
-    minCommitPercentage: 10,
+    minRecentCommits: 10,
+    minCommitPercentage: 2,
     recentMonths: 3
 }
 
@@ -21,9 +22,10 @@ interface RepoStats {
     busFactor: number
     contributors: number
     commits: number
-    issues: number
+    openIssues: number    // Rename from issues
+    closedIssues: number  // Add this field
     isProcessing?: boolean
-    contributorShares: ContributorShare[] // Add this field
+    contributorShares: ContributorShare[]
     analyzedMonths: number
 }
 
@@ -45,9 +47,29 @@ export async function getRepoStats(
     try {
         const since = new Date()
         since.setTime(since.getTime() - contributorConfig.recentMonths * 30 * 24 * 60 * 60 * 1000)
-        const [issues, commits] = await Promise.all([
-            octokit.paginate(octokit.issues.listForRepo, { owner, repo, state: 'open', since: since.toISOString().split('.')[0] + 'Z', per_page: 100 }),
-            octokit.paginate(octokit.repos.listCommits, { owner, repo, since: since.toISOString().split('.')[0] + 'Z', per_page: 100 })
+        const sinceISO = toISOStringWithoutMs(since)
+
+        const [openIssues, closedIssues, commits] = await Promise.all([
+            octokit.paginate(octokit.issues.listForRepo, {
+                owner,
+                repo,
+                state: 'open',
+                since: sinceISO,
+                per_page: 100
+            }),
+            octokit.paginate(octokit.issues.listForRepo, {
+                owner,
+                repo,
+                state: 'closed',
+                since: sinceISO,
+                per_page: 100
+            }),
+            octokit.paginate(octokit.repos.listCommits, {
+                owner,
+                repo,
+                since: sinceISO,
+                per_page: 100
+            })
         ])
 
         // Calculate the date threshold for recent commits
@@ -108,7 +130,8 @@ export async function getRepoStats(
             busFactor,
             contributors: totalContributors,
             commits: totalRecentCommits,
-            issues: issues.length,
+            openIssues: openIssues.length,
+            closedIssues: closedIssues.length,
             isProcessing: false,
             contributorShares,
             analyzedMonths: contributorConfig.recentMonths
