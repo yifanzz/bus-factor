@@ -3,7 +3,7 @@ import type { RepoStats } from '@/types/repo'
 import { sql } from 'kysely'
 
 export async function getRepoStats(repoName: string): Promise<{
-    stats: RepoStats
+    stats: RepoStats & { calculatedAt?: Date }
     calculatedAt: Date
 } | null> {
     const result = await db
@@ -15,7 +15,10 @@ export async function getRepoStats(repoName: string): Promise<{
     if (!result) return null
 
     return {
-        stats: result.stats as RepoStats,
+        stats: {
+            ...result.stats as RepoStats,
+            calculatedAt: result.calculatedAt
+        },
         calculatedAt: result.calculatedAt
     }
 }

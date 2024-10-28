@@ -14,6 +14,7 @@ interface Stats {
     contributorShares: ContributorShare[]
     analyzedMonths: number
     issueHistory: IssueTimeSeries
+    calculatedAt?: Date
 }
 
 interface StatsDisplayProps {
@@ -57,6 +58,17 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
         return Math.min((factor / 10) * 100, 100)
     }
 
+    function formatDate(date?: Date) {
+        if (!date) return 'Unknown'
+        return new Date(date).toLocaleString(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        })
+    }
+
     const pieData = stats.contributorShares.map(share => ({
         name: share.name,
         value: share.percentage
@@ -65,9 +77,14 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
     return (
         <div className="space-y-6">
             {/* Analysis Period Notice */}
-            <p className="text-sm text-muted-foreground text-center">
-                This analysis is based on repository activity in the last {stats.analyzedMonths} months
-            </p>
+            <div className="text-center space-y-1">
+                <p className="text-sm text-muted-foreground">
+                    This analysis is based on repository activity in the last {stats.analyzedMonths} months
+                </p>
+                <p className="text-xs text-muted-foreground">
+                    Last updated: {formatDate(stats.calculatedAt)}
+                </p>
+            </div>
 
             {/* Bus Factor Card */}
             <Card className={`bg-gradient-to-br ${getBusFactorColor(stats.busFactor)}`}>

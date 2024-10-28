@@ -6,12 +6,6 @@ import { Button } from "@/components/ui/button"
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
 import { useRouter } from "next/dist/client/components/navigation"
 
-const PRESET_REPOS = [
-    { name: "Sage", repo: "storia-ai/sage" },
-    { name: "LangChainJS", repo: "langchain-ai/langchainjs" },
-    { name: "Dify", repo: "langgenius/dify" },
-]
-
 export function AnalyzeForm() {
     const router = useRouter()
     const [repoName, setRepoName] = useState("")
@@ -40,30 +34,8 @@ export function AnalyzeForm() {
         }
     }
 
-    function handlePresetSelect(repo: string) {
-        const [owner, repoName] = repo.split('/')
-        if (owner && repoName) {
-            router.push(`/report/${owner}/${repoName}?refresh=${forceRefresh}`)
-        }
-    }
-
     return (
         <div className="space-y-4">
-            <div className="flex flex-wrap gap-2 justify-center">
-                {PRESET_REPOS.map(({ name, repo }) => (
-                    <Button
-                        key={repo}
-                        variant="outline"
-                        onClick={() => handlePresetSelect(repo)}
-                        disabled={isLoading}
-                        className="min-w-32"
-                    >
-                        <GitHubLogoIcon className="mr-2 h-4 w-4" />
-                        {name}
-                    </Button>
-                ))}
-            </div>
-
             <form onSubmit={handleSubmit} className="mb-8">
                 <div className="space-y-4">
                     <div className="flex gap-2">
