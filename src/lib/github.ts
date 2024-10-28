@@ -8,7 +8,7 @@ interface ContributorConfig {
 
 const DEFAULT_CONTRIBUTOR_CONFIG: ContributorConfig = {
     minRecentCommits: 5,
-    minCommitPercentage: 2,
+    minCommitPercentage: 10,
     recentMonths: 3
 }
 
@@ -30,7 +30,7 @@ interface RepoStats {
 export async function getRepoStats(
     repoName: string,
     token: string,
-    config: ContributorConfig = DEFAULT_CONTRIBUTOR_CONFIG
+    config: Partial<ContributorConfig> = {}
 ): Promise<RepoStats> {
     const octokit = new Octokit({ auth: token })
     const [owner, repo] = repoName.split('/')

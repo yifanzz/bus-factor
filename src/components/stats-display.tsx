@@ -1,7 +1,7 @@
-"use client"
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
+import { Suspense } from "react"
+import { ContributorChart } from "@/components/charts/contributor-chart"
+
 
 interface ContributorShare {
     name: string
@@ -114,35 +114,6 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
                 </div>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Contributor Distribution</CardTitle>
-                </CardHeader>
-                <CardContent className="h-[400px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={pieData}
-                                dataKey="value"
-                                nameKey="name"
-                                cx="50%"
-                                cy="50%"
-                                outerRadius={120}
-                                label={({ name, value }) => `${name} (${value}%)`}
-                            >
-                                {pieData.map((_, index) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={COLORS[index % COLORS.length]}
-                                    />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                        </PieChart>
-                    </ResponsiveContainer>
-                </CardContent>
-            </Card>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                     <CardHeader>
@@ -174,6 +145,17 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
                     </CardContent>
                 </Card>
             </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Contributor Distribution</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Suspense fallback={<div className="h-[300px] animate-pulse bg-muted" />}>
+                        <ContributorChart data={stats.contributorShares} />
+                    </Suspense>
+                </CardContent>
+            </Card>
         </div>
     )
 }
