@@ -67,3 +67,4 @@ Git Usage
   - "chore" for chore tasks
 - when determining the commit message prefix, pick the most relevant prefix from the list above
 - use lower case for commit messages
+- the commit message should also include a list of the changes made in the commit after the summary line if the changes are not self explanatory
