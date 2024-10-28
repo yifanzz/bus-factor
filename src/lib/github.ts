@@ -2,37 +2,22 @@ import { Octokit } from "@octokit/rest"
 import { toISOStringWithoutMs } from "@/lib/utils"
 import { ContributorShare, IssueTimeSeries, RepoStats } from "@/types/repo"
 import { calculateContributorStats, calculateIssueHistory } from "@/lib/github-stats"
-
-interface ContributorConfig {
-    minRecentCommits: number      // Minimum number of commits in recent period
-    minCommitPercentage: number   // Minimum percentage of total commits (0-100)
-    recentMonths: number          // Number of months to consider for recent activity
-}
-
-const DEFAULT_CONTRIBUTOR_CONFIG: ContributorConfig = {
-    minRecentCommits: 10,
-    minCommitPercentage: 2,
-    recentMonths: 3
-}
+import { CONTRIBUTOR_CONFIG, getAnalysisTimeframe } from "@/lib/config/contributor"
 
 export async function getRepoStats(
     repoName: string,
     token: string,
-    config: Partial<ContributorConfig> = {}
+    config = CONTRIBUTOR_CONFIG
 ): Promise<RepoStats> {
     const octokit = new Octokit({ auth: token })
     const [owner, repo] = repoName.split('/')
-
-    // Merge default config with provided options
-    const contributorConfig = { ...DEFAULT_CONTRIBUTOR_CONFIG, ...config }
 
     if (!owner || !repo) {
         throw new Error('Invalid repository name. Format should be owner/repo')
     }
 
     try {
-        const since = new Date()
-        since.setTime(since.getTime() - contributorConfig.recentMonths * 30 * 24 * 60 * 60 * 1000)
+        const since = getAnalysisTimeframe()
         const sinceISO = toISOStringWithoutMs(since)
 
         const [openIssues, closedIssues, commits] = await Promise.all([
@@ -59,7 +44,7 @@ export async function getRepoStats(
         ])
 
         const [contributorStats, issueHistory] = await Promise.all([
-            calculateContributorStats(commits, contributorConfig),
+            calculateContributorStats(commits, config),
             calculateIssueHistory([...openIssues, ...closedIssues])
         ])
 
@@ -75,7 +60,7 @@ export async function getRepoStats(
             openIssues: openIssues.length,
             closedIssues: closedIssues.length,
             isProcessing: false,
-            analyzedMonths: contributorConfig.recentMonths,
+            analyzedMonths: config.recentMonths,
             stars: repoData.stargazers_count,
             issueHistory
         }

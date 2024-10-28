@@ -2,6 +2,7 @@ import { getRecentRepos } from "@/app/actions/get-recent-repos"
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
 import { StarIcon } from "@radix-ui/react-icons"
+import { formatDistanceToNow } from "date-fns"
 
 // Add color constants for the traffic light system
 const BUS_FACTOR_COLORS = {
@@ -37,7 +38,7 @@ export async function RecentRepos() {
                             <div className="flex flex-col">
                                 <span className="font-medium">{repoName}</span>
                                 <span className="text-sm text-muted-foreground">
-                                    {new Date(calculatedAt).toLocaleDateString()}
+                                    updated {calculatedAt && formatDistanceToNow(calculatedAt, { addSuffix: true })}
                                 </span>
                             </div>
                             <div className="flex items-center gap-4">

@@ -3,7 +3,10 @@ import { Suspense } from "react"
 import { ContributorChart } from "@/components/charts/contributor-chart"
 import { IssueHistoryChart } from "@/components/charts/issue-history-chart"
 import { ContributorShare, IssueTimeSeries } from "@/types/repo"
-
+import { formatDistanceToNow } from "date-fns"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { InfoCircledIcon } from "@radix-ui/react-icons"
+import { CONTENT } from "@/lib/content"
 
 interface Stats {
     busFactor: number
@@ -59,17 +62,6 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
         return Math.min((factor / 10) * 100, 100)
     }
 
-    function formatDate(date?: Date) {
-        if (!date) return 'Unknown'
-        return new Date(date).toLocaleString(undefined, {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        })
-    }
-
     const pieData = stats.contributorShares.map(share => ({
         name: share.name,
         value: share.percentage
@@ -86,9 +78,15 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
                     This analysis is based on repository activity in the last {stats.analyzedMonths} months
                 </p>
                 <p className="text-xs text-muted-foreground">
-                    Last updated: {formatDate(stats.calculatedAt)}
+                    Last updated: {stats.calculatedAt && formatDistanceToNow(stats.calculatedAt, { addSuffix: true })}
                 </p>
             </div>
+
+            {/* Bus Factor Explanation */}
+            <Alert>
+                <InfoCircledIcon className="h-4 w-4" />
+                <AlertDescription>{CONTENT.BUS_FACTOR.DESCRIPTION}</AlertDescription>
+            </Alert>
 
             {/* Bus Factor Card */}
             <Card className={`bg-gradient-to-br ${getBusFactorColor(stats.busFactor)}`}>
@@ -133,6 +131,24 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
                     <span>10</span>
                 </div>
             </div>
+
+            {/* Bus Factor Scale Explanation */}
+            <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <span className="text-muted-foreground">{CONTENT.BUS_FACTOR.SCALE.RED}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-amber-500" />
+                    <span className="text-muted-foreground">{CONTENT.BUS_FACTOR.SCALE.AMBER}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <span className="text-muted-foreground">{CONTENT.BUS_FACTOR.SCALE.GREEN}</span>
+                </div>
+            </div>
+
+            <h3 className="text-lg font-semibold">Repository Activity (last {stats.analyzedMonths} months)</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>

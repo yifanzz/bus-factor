@@ -1,5 +1,8 @@
 import { AnalyzeForm } from '@/components/analyze-form'
 import { RecentRepos } from '@/components/recent-repos'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { InfoCircledIcon } from "@radix-ui/react-icons"
+import { CONTENT } from "@/lib/content"
 import { Suspense } from 'react'
 
 export default function Home() {
@@ -7,6 +10,13 @@ export default function Home() {
     <main className="min-h-screen bg-background">
       <div className="container mx-auto p-4 max-w-2xl">
         <h1 className="text-3xl font-bold mb-6 text-center">BusFactor</h1>
+
+        {/* Bus Factor Explanation */}
+        <Alert className="mb-6">
+          <InfoCircledIcon className="h-4 w-4" />
+          <AlertDescription>{CONTENT.BUS_FACTOR.DESCRIPTION}</AlertDescription>
+        </Alert>
+
         <AnalyzeForm />
         <div className="mt-8">
           <Suspense fallback={<div className="animate-pulse space-y-2">

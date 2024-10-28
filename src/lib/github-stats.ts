@@ -1,22 +1,11 @@
 import { Octokit } from "@octokit/rest"
 import { ContributorShare, IssueTimeSeries } from "@/types/repo"
 import { toISOStringWithoutMs } from "@/lib/utils"
-
-interface ContributorConfig {
-    minRecentCommits: number
-    minCommitPercentage: number
-    recentMonths: number
-}
-
-const DEFAULT_CONTRIBUTOR_CONFIG: ContributorConfig = {
-    minRecentCommits: 10,
-    minCommitPercentage: 2,
-    recentMonths: 3
-}
+import { CONTRIBUTOR_CONFIG, isActiveContributor } from "@/lib/config/contributor"
 
 export async function calculateContributorStats(
     commits: any[],
-    config: ContributorConfig
+    config = CONTRIBUTOR_CONFIG
 ): Promise<{
     busFactor: number
     contributors: number
@@ -42,7 +31,7 @@ export async function calculateContributorStats(
 
     // When creating contributorShares, include the commit count
     const contributorShares: ContributorShare[] = Array.from(authorCommits.entries())
-        .filter(([_, count]) => count >= config.minRecentCommits && (count / totalRecentCommits) * 100 >= config.minCommitPercentage)
+        .filter(([_, count]) => isActiveContributor(count, totalRecentCommits))
         .map(([author, count]) => ({
             name: author,
             commits: count,
