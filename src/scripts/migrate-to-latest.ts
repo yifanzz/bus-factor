@@ -7,7 +7,7 @@ import {
     PostgresDialect,
     FileMigrationProvider,
 } from 'kysely'
-import { Database } from './types'
+import { Database } from '@/lib/db'
 import dotenv from 'dotenv'
 
 dotenv.config()

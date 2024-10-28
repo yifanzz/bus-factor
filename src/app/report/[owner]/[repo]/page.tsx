@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
+import { analyzeRepo } from "@/app/actions/analyze-repo"
 
 interface ReportPageProps {
     params: Promise<{
@@ -20,6 +21,8 @@ export default async function ReportPage({ params }: ReportPageProps) {
         redirect("/")
     }
 
+    const stats = await analyzeRepo(`${owner}/${repo}`)
+
     return (
         <main className="min-h-screen bg-background">
             <div className="container mx-auto p-4 max-w-2xl">
@@ -27,22 +30,9 @@ export default async function ReportPage({ params }: ReportPageProps) {
                     Report for {owner}/{repo}
                 </h1>
                 <Suspense fallback={<div>Loading...</div>}>
-                    <ReportContent owner={owner} repo={repo} token={session.githubAccessToken} />
+                    <StatsDisplay stats={stats} />
                 </Suspense>
             </div>
         </main>
     )
-}
-
-async function ReportContent({
-    owner,
-    repo,
-    token
-}: {
-    owner: string
-    repo: string
-    token: string
-}) {
-    const stats = await getRepoStats(`${owner}/${repo}`, token)
-    return <StatsDisplay stats={stats} />
 }

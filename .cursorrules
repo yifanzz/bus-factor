@@ -24,6 +24,8 @@ Database
 - Use Kysely for database queries
 - Use PostgresDialect for Kysely
 - Always use migrations to update the database schema
+- When adding a new field to a table, add it to the migration file and update the schema file
+- When changing db models, add a migration file and update the schema file (in src/lib/migrations/) it should follow the naming convention of the other migration files
 
 Syntax and Formatting
 - Use the "function" keyword for pure functions.

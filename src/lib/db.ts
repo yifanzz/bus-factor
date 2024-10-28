@@ -12,6 +12,12 @@ export interface Database extends AuthDatabase {
     users: AuthDatabase['User'] & {
         githubToken: string | null
     }
+    repo_stats: {
+        id: string
+        repo_name: string
+        stats: unknown
+        calculated_at: Date
+    }
 }
 
 const dialect = new PostgresDialect({
