@@ -24,15 +24,16 @@ interface RepoStats {
     issues: number
     isProcessing?: boolean
     contributorShares: ContributorShare[] // Add this field
+    analyzedMonths: number
 }
 
 export async function getRepoStats(
-    repoFullName: string,
-    accessToken: string,
-    config: Partial<ContributorConfig> = DEFAULT_CONTRIBUTOR_CONFIG
+    repoName: string,
+    token: string,
+    config: ContributorConfig = DEFAULT_CONTRIBUTOR_CONFIG
 ): Promise<RepoStats> {
-    const octokit = new Octokit({ auth: accessToken })
-    const [owner, repo] = repoFullName.split('/')
+    const octokit = new Octokit({ auth: token })
+    const [owner, repo] = repoName.split('/')
 
     // Merge default config with provided options
     const contributorConfig = { ...DEFAULT_CONTRIBUTOR_CONFIG, ...config }
@@ -109,7 +110,8 @@ export async function getRepoStats(
             commits: totalRecentCommits,
             issues: issues.length,
             isProcessing: false,
-            contributorShares
+            contributorShares,
+            analyzedMonths: contributorConfig.recentMonths
         }
     } catch (error) {
         console.error('Error fetching repository data:', error)

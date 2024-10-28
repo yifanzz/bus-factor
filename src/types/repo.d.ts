@@ -10,4 +10,5 @@ export interface RepoStats {
     issues: number
     isProcessing?: boolean
     contributorShares: ContributorShare[]
+    analyzedMonths: number  // Add this field
 }

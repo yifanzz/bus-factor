@@ -16,11 +16,10 @@ export async function analyzeRepo(formData: FormData) {
     }
 
     try {
-        // You can adjust these values based on your needs
         const config = {
             minRecentCommits: 5,
             minCommitPercentage: 2,
-            recentMonths: 3
+            recentMonths: 3  // This will be passed to getRepoStats
         }
 
         return await getRepoStats(repoName, session.githubAccessToken, config)
