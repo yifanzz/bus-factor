@@ -4,101 +4,45 @@ import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
-import { analyzeRepo } from "@/app/actions/analyze-repo"
 import { cn } from "@/lib/utils"
-import { RepoStats } from "@/types/repo"
-
-interface AnalysisState {
-    isLoading: boolean
-    error?: string
-    retryCount: number
-    currentResult?: RepoStats
-}
-
-interface AnalyzeFormProps {
-    onAnalysisComplete: (stats: RepoStats) => void
-    isAnalyzing?: boolean
-}
-
+import { useRouter } from "next/dist/client/components/navigation"
 const PRESET_REPOS = [
     { name: "Sage", repo: "storia-ai/sage" },
     { name: "LangChainJS", repo: "langchain-ai/langchainjs" },
     { name: "Dify", repo: "langgenius/dify" },
 ]
-
-export function AnalyzeForm({ onAnalysisComplete, isAnalyzing }: AnalyzeFormProps) {
+export function AnalyzeForm() {
+    const router = useRouter()
     const [repoName, setRepoName] = useState("")
-    const [analysisState, setAnalysisState] = useState<AnalysisState>({
-        isLoading: false,
-        retryCount: 0
-    })
+    const [error, setError] = useState<string>()
+    const [isLoading, setIsLoading] = useState(false)
 
     async function handleAnalysis(formData: FormData) {
         const repo = formData.get("repoName") as string
         if (!repo) return
 
+        // Extract owner and repo name
+        const [owner, repoName] = repo.split('/')
+        if (!owner || !repoName) {
+            setError("Invalid repository format. Use owner/repo")
+            return
+        }
+
+        setIsLoading(true)
         try {
-            setAnalysisState(prev => ({ ...prev, isLoading: true, error: undefined }))
-            const result = await analyzeRepo(formData)
-
-            if (result.isProcessing && analysisState.retryCount < 5) {
-                setAnalysisState(prev => ({
-                    ...prev,
-                    isLoading: true,
-                    retryCount: prev.retryCount + 1,
-                    currentResult: result
-                }))
-            } else {
-                setAnalysisState({
-                    isLoading: false,
-                    retryCount: 0,
-                    currentResult: result
-                })
-            }
-
-            onAnalysisComplete(result)
+            router.push(`/report/${owner}/${repoName}`)
         } catch (error) {
-            setAnalysisState({
-                isLoading: false,
-                retryCount: 0,
-                error: "Failed to analyze repository"
-            })
+            setError("Failed to analyze repository")
+        } finally {
+            setIsLoading(false)
         }
     }
 
     function handlePresetSelect(repo: string) {
-        setRepoName(repo)
-        const formData = new FormData()
-        formData.set("repoName", repo)
-        handleAnalysis(formData)
-    }
-
-    // Handle retries
-    useEffect(() => {
-        if (analysisState.currentResult?.isProcessing && analysisState.retryCount < 5) {
-            const timer = setTimeout(() => {
-                const formData = new FormData()
-                formData.set("repoName", repoName)
-                handleAnalysis(formData)
-            }, 15000)
-            return () => clearTimeout(timer)
+        const [owner, repoName] = repo.split('/')
+        if (owner && repoName) {
+            router.push(`/report/${owner}/${repoName}`)
         }
-    }, [analysisState.currentResult?.isProcessing, analysisState.retryCount, repoName])
-
-    function getStatusMessage() {
-        if (analysisState.error) {
-            return { text: analysisState.error, type: "error" as const }
-        }
-        if (analysisState.isLoading && analysisState.currentResult?.isProcessing) {
-            return {
-                text: `GitHub is processing the data (Attempt ${analysisState.retryCount}/5)...`,
-                type: "processing" as const
-            }
-        }
-        if (analysisState.currentResult && !analysisState.currentResult.isProcessing) {
-            return { text: "Analysis complete", type: "success" as const }
-        }
-        return null
     }
 
     return (
@@ -109,7 +53,7 @@ export function AnalyzeForm({ onAnalysisComplete, isAnalyzing }: AnalyzeFormProp
                         key={repo}
                         variant="outline"
                         onClick={() => handlePresetSelect(repo)}
-                        disabled={analysisState.isLoading || isAnalyzing}
+                        disabled={isLoading}
                         className="min-w-32"
                     >
                         <GitHubLogoIcon className="mr-2 h-4 w-4" />
@@ -127,26 +71,19 @@ export function AnalyzeForm({ onAnalysisComplete, isAnalyzing }: AnalyzeFormProp
                         onChange={(e) => setRepoName(e.target.value)}
                         placeholder="Enter GitHub repository name (e.g., owner/repo)"
                         className="flex-grow"
-                        disabled={analysisState.isLoading || isAnalyzing}
+                        disabled={isLoading}
                     />
                     <Button
                         type="submit"
-                        disabled={analysisState.isLoading || isAnalyzing}
+                        disabled={isLoading}
                     >
                         <GitHubLogoIcon className="mr-2 h-4 w-4" />
-                        {analysisState.isLoading ? "Processing..." : "Analyze"}
+                        {isLoading ? "Processing..." : "Analyze"}
                     </Button>
                 </div>
-                {getStatusMessage() && (
-                    <p className={cn(
-                        "mt-2 text-sm",
-                        {
-                            "text-yellow-500": getStatusMessage()?.type === "processing",
-                            "text-green-500": getStatusMessage()?.type === "success",
-                            "text-red-500": getStatusMessage()?.type === "error"
-                        }
-                    )}>
-                        {getStatusMessage()?.text}
+                {error && (
+                    <p className="mt-2 text-sm text-red-500">
+                        {error}
                     </p>
                 )}
             </form>
