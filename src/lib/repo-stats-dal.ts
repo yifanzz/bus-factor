@@ -38,3 +38,22 @@ export async function saveRepoStats(repoName: string, stats: RepoStats): Promise
         )
         .execute()
 }
+
+export async function getRecentRepoStats(limit = 10): Promise<{
+    repoName: string
+    stats: RepoStats
+    calculatedAt: Date
+}[]> {
+    const results = await db
+        .selectFrom('repo_stats')
+        .select(['repo_name as repoName', 'stats as stats', 'calculated_at as calculatedAt'])
+        .orderBy('calculated_at', 'desc')
+        .limit(limit)
+        .execute()
+
+    return results.map(result => ({
+        repoName: result.repoName,
+        stats: result.stats as RepoStats,
+        calculatedAt: result.calculatedAt
+    }))
+}
