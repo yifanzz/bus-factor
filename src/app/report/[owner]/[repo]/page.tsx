@@ -24,9 +24,8 @@ export default async function ReportPage({ params, searchParams }: ReportPagePro
         redirect("/")
     }
 
-    // Convert the refresh param to boolean
-    const { refreshParam } = await searchParams
-    const forceRefresh = refreshParam === 'true'
+    const { refresh } = await searchParams
+    const forceRefresh = refresh === 'true'
 
     const stats = await analyzeRepo(`${owner}/${repo}`, forceRefresh)
 

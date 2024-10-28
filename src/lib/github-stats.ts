@@ -40,29 +40,25 @@ export async function calculateContributorStats(
         authorCommits.set(authorName, (authorCommits.get(authorName) || 0) + 1)
     }
 
-    // Calculate contributor shares
-    const contributorShares: ContributorShare[] = []
-    let othersPercentage = 0
+    // When creating contributorShares, include the commit count
+    const contributorShares: ContributorShare[] = Array.from(authorCommits.entries())
+        .filter(([_, count]) => count >= config.minRecentCommits && (count / totalRecentCommits) * 100 >= config.minCommitPercentage)
+        .map(([author, count]) => ({
+            name: author,
+            commits: count,
+            percentage: Number(((count / totalRecentCommits) * 100).toFixed(1))
+        }))
 
-    for (const [name, commitCount] of authorCommits.entries()) {
-        const percentage = (commitCount / totalRecentCommits) * 100
-
-        if (commitCount >= config.minRecentCommits &&
-            percentage >= config.minCommitPercentage) {
-            contributorShares.push({
-                name,
-                percentage: Number(percentage.toFixed(1))
-            })
-        } else {
-            othersPercentage += percentage
-        }
-    }
+    // Calculate others' commits and percentage
+    const othersCommits = totalRecentCommits - contributorShares.reduce((sum, share) => sum + share.commits, 0)
+    const othersPercentage = Number(((othersCommits / totalRecentCommits) * 100).toFixed(1))
 
     // Add "Others" category if there are small contributors
     if (othersPercentage > 0) {
         contributorShares.push({
             name: 'Others',
-            percentage: Number(othersPercentage.toFixed(1))
+            commits: othersCommits,
+            percentage: othersPercentage
         })
     }
 

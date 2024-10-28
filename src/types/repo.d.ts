@@ -1,6 +1,7 @@
 export interface ContributorShare {
     name: string
     percentage: number
+    commits: number
 }
 
 export interface TimeSeriesPoint {

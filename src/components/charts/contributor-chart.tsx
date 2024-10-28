@@ -15,12 +15,12 @@ export function ContributorChart({ data }: ContributorChartProps) {
             <PieChart>
                 <Pie
                     data={data}
-                    dataKey="percentage"
                     nameKey="name"
+                    dataKey="percentage"
                     cx="50%"
                     cy="50%"
                     outerRadius={80}
-                    label={({ name, value }) => `${name} (${value}%)`}
+                    label={({ name, commits, percentage }) => `${name} (${commits})`}
                 >
                     {data.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

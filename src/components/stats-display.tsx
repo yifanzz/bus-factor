@@ -120,7 +120,6 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
                     </CardHeader>
                     <CardContent className="flex justify-between items-center">
                         <span className="text-2xl font-semibold">{stats.contributors}</span>
-                        <Trendline trend="up" />
                     </CardContent>
                 </Card>
 
@@ -130,7 +129,6 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
                     </CardHeader>
                     <CardContent className="flex justify-between items-center">
                         <span className="text-2xl font-semibold">{stats.commits}</span>
-                        <Trendline trend="stable" />
                     </CardContent>
                 </Card>
 
@@ -141,15 +139,12 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
                     <CardContent className="flex justify-between items-center">
                         <div className="flex flex-col">
                             <span className="text-2xl font-semibold">
-                                {stats.openIssues}/{stats.closedIssues}
+                                {stats.openIssues} / {stats.closedIssues}
                             </span>
                             <span className="text-xs text-muted-foreground">
-                                Open/Closed
+                                Open / Closed
                             </span>
                         </div>
-                        <Trendline
-                            trend={stats.openIssues > stats.closedIssues ? "up" : "down"}
-                        />
                     </CardContent>
                 </Card>
             </div>
@@ -162,12 +157,16 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
                     <Suspense fallback={<div className="h-[300px] animate-pulse bg-muted" />}>
                         <ContributorChart data={stats.contributorShares} />
                     </Suspense>
+
+                    <p className="text-sm text-muted-foreground text-center">
+                        Only contributors with significant contributions are shown.
+                    </p>
                 </CardContent>
             </Card>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Issues Over Time</CardTitle>
+                    <CardTitle>Open vs Closed Issues</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Suspense fallback={<div className="h-[300px] animate-pulse bg-muted" />}>

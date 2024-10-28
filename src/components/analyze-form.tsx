@@ -32,7 +32,7 @@ export function AnalyzeForm() {
 
         setIsLoading(true)
         try {
-            router.push(`/report/${owner}/${repo}?refresh=${forceRefresh}`)
+            router.push(`/report/${owner}/${repo}${forceRefresh ? "?refresh=true" : ""}`)
         } catch (error) {
             setError("Failed to analyze repository")
         } finally {
