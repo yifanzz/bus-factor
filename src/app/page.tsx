@@ -5,6 +5,8 @@ import { InfoCircledIcon } from "@radix-ui/react-icons"
 import { CONTENT } from "@/lib/content"
 import { Suspense } from 'react'
 
+export const revalidate = 60 * 5 // Revalidate at most every 3 minutes
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-background">

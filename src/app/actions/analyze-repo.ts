@@ -8,13 +8,13 @@ const CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
 export async function analyzeRepo(repoName: string, forceRefresh = false) {
     console.log(`Analyzing ${repoName} with forceRefresh=${forceRefresh}`)
-    const session = await getSession()
-    if (!session?.user) {
-        throw new Error("Unauthorized")
-    }
 
-    if (!session.githubAccessToken) {
-        throw new Error("GitHub token not found")
+    // Only check authentication for force refresh
+    if (forceRefresh) {
+        const session = await getSession()
+        if (!session?.user) {
+            throw new Error("Authentication required to refresh data")
+        }
     }
 
     try {
@@ -30,6 +30,12 @@ export async function analyzeRepo(repoName: string, forceRefresh = false) {
                     }
                 }
             }
+        }
+
+        // For new analysis or expired cache, we need authentication
+        const session = await getSession()
+        if (!session?.user || !session.githubAccessToken) {
+            throw new Error("Authentication required to analyze new repositories")
         }
 
         // Fetch fresh data
