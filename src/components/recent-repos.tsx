@@ -12,7 +12,7 @@ const BUS_FACTOR_COLORS = {
 } as const
 
 function getBusFactorColor(factor: number) {
-    if (factor === 1) return BUS_FACTOR_COLORS.red
+    if (factor < 2) return BUS_FACTOR_COLORS.red
     if (factor >= 2 && factor <= 3) return BUS_FACTOR_COLORS.amber
     return BUS_FACTOR_COLORS.green
 }
