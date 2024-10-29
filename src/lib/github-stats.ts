@@ -1,19 +1,10 @@
 import { ContributorShare, IssueTimeSeries } from "@/types/repo"
 import { CONTRIBUTOR_CONFIG, isActiveContributor } from "@/lib/config/contributor"
+import { components } from "@octokit/openapi-types";
 
 export async function calculateContributorStats(
-    commits: {
-        commit: {
-            author?: {
-                date: string
-                name: string
-            }
-        },
-        author?: {
-            login: string
-        }
-    }[],
-    config = CONTRIBUTOR_CONFIG
+    commits: components["schemas"]["commit"][],
+    config: { readonly minRecentCommits: number; readonly minCommitPercentage: number; readonly recentMonths: number } = CONTRIBUTOR_CONFIG
 ): Promise<{
     busFactor: number
     contributors: number
@@ -72,10 +63,7 @@ export async function calculateContributorStats(
 }
 
 export async function calculateIssueHistory(
-    issues: {
-        created_at: string
-        state: 'open' | 'closed'
-    }[]
+    issues: components["schemas"]["issue"][]
 ): Promise<IssueTimeSeries> {
     // Group issues by week
     const openIssuesByWeek = new Map<string, number>()

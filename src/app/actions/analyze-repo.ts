@@ -1,15 +1,14 @@
 "use server"
 
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { getRepoStats as fetchGithubStats } from "@/lib/github"
 import { getRepoStats, saveRepoStats } from "@/lib/repo-stats-dal"
+import { getSession } from "@/lib/auth";
 
 const CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
 export async function analyzeRepo(repoName: string, forceRefresh = false) {
     console.log(`Analyzing ${repoName} with forceRefresh=${forceRefresh}`)
-    const session = await getServerSession(authOptions)
+    const session = await getSession()
     if (!session?.user) {
         throw new Error("Unauthorized")
     }

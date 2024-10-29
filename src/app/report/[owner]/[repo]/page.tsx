@@ -5,15 +5,9 @@ import { Button } from "@/components/ui/button"
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { RefreshButton } from "@/components/refresh-button"
+import { PageProps } from ".next/types/app/layout"
 
-interface ReportPageProps {
-    params: {
-        owner: string
-        repo: string
-    }
-}
-
-export default async function ReportPage({ params }: ReportPageProps) {
+export default async function ReportPage({ params }: PageProps) {
     const { owner, repo } = await params
 
     // Get the stats
