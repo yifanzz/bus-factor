@@ -80,7 +80,6 @@ export function AnalyzeForm() {
                             type="submit"
                             disabled={isLoading}
                         >
-                            <GitHubLogoIcon className="mr-2 h-4 w-4" />
                             Analyze
                         </Button>
                     </div>

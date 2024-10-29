@@ -4,6 +4,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
 import { CONTENT } from "@/lib/content"
 import { Suspense } from 'react'
+import Image from 'next/image'
 
 export const revalidate = 300 // 5 minutes in seconds
 
@@ -11,6 +12,16 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto p-4 max-w-2xl">
+        <div className="flex justify-center mb-4">
+          <Image
+            src="/logo.png"
+            alt="BusFactor Logo"
+            width={200}
+            height={100}
+            priority
+            className="rounded-lg bg-gradient-to-br from-transparent to-black/30 shadow-lg"
+          />
+        </div>
         <h1 className="text-3xl font-bold mb-6 text-center">BusFactor</h1>
 
         {/* Bus Factor Explanation */}
