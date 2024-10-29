@@ -11,14 +11,14 @@ export const authOptions: AuthOptions = {
             clientSecret: process.env.GITHUB_SECRET!,
             authorization: {
                 params: {
-                    scope: 'read:user user:email public_repo',
+                    scope: 'read:user user:email',
                 },
             },
         }),
     ],
     adapter: KyselyAdapter(db),
     callbacks: {
-        async jwt({token, account, user}) {
+        async jwt({ token, account, user }) {
             if (account) {
                 token.githubAccessToken = account.access_token
             }
@@ -27,7 +27,7 @@ export const authOptions: AuthOptions = {
             }
             return token
         },
-        async session({session, token, user}) {
+        async session({ session, token, user }) {
             if (session.user) {
                 session.user.id = token.sub || user?.id || ""
             }

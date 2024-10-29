@@ -113,6 +113,8 @@ export function AnalyzeForm() {
                         <DialogTitle>Authentication Required</DialogTitle>
                         <DialogDescription>
                             This repository hasn&apos;t been analyzed yet. Please sign in with GitHub to analyze it.
+
+                            It won&apos;t request any permissions beyond public information.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="flex justify-end">
