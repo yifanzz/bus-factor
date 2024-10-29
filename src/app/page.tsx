@@ -5,7 +5,7 @@ import { InfoCircledIcon } from "@radix-ui/react-icons"
 import { CONTENT } from "@/lib/content"
 import { Suspense } from 'react'
 
-export const revalidate = 60 * 5 // Revalidate at most every 3 minutes
+export const revalidate = 300 // 5 minutes in seconds
 
 export default function Home() {
   return (
