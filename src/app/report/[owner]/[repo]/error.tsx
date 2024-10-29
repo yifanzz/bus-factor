@@ -1,5 +1,9 @@
 'use client'
 
+import { isKnownError } from "@/lib/errors"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
+
 export default function Error({
     error,
     reset,
@@ -7,16 +11,21 @@ export default function Error({
     error: Error & { digest?: string }
     reset: () => void
 }) {
+    const message = isKnownError(error)
+        ? error.message
+        : "Something went wrong! Please try again later."
+
     return (
-        <div className="container mx-auto p-4 max-w-2xl text-center">
-            <h2 className="text-xl font-bold mb-4">Something went wrong!</h2>
-            <p className="text-muted-foreground mb-4">{error.message}</p>
-            <button
-                onClick={() => reset()}
-                className="bg-primary text-primary-foreground px-4 py-2 rounded-md"
-            >
-                Try again
-            </button>
+        <div className="container mx-auto p-4 max-w-2xl">
+            <Alert variant="destructive">
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{message}</AlertDescription>
+            </Alert>
+            <div className="mt-4 flex justify-center">
+                <Button onClick={() => reset()}>
+                    Try again
+                </Button>
+            </div>
         </div>
     )
 }

@@ -69,3 +69,18 @@ export async function getRepoStats(
         throw new Error('Failed to analyze repository. Please check the repository name and try again.')
     }
 }
+
+export async function checkRepoExists(repoName: string, token: string): Promise<boolean> {
+    const octokit = new Octokit({ auth: token })
+    const [owner, repo] = repoName.split('/')
+
+    try {
+        await octokit.repos.get({
+            owner,
+            repo,
+        })
+        return true
+    } catch (error) {
+        return false
+    }
+}

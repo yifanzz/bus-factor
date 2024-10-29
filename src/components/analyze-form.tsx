@@ -14,6 +14,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import { isValidRepoFormat } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { ValidationError, AuthenticationError, NotFoundError } from "@/lib/errors"
 
 export function AnalyzeForm() {
     const { data: session } = useSession()
@@ -23,20 +26,26 @@ export function AnalyzeForm() {
     const [isLoading, setIsLoading] = useState(false)
     const [showAuthDialog, setShowAuthDialog] = useState(false)
     const [pendingRepo, setPendingRepo] = useState<{ owner: string, repo: string } | null>(null)
+    const [isValidFormat, setIsValidFormat] = useState(true)
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value
+        setRepoName(value)
+        setIsValidFormat(value === "" || isValidRepoFormat(value))
+        setError(undefined)
+    }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         if (!repoName) return
 
-        // Extract owner and repo name
-        const [owner, repo] = repoName.split('/')
-        if (!owner || !repo) {
-            setError("Invalid repository format. Use owner/repo")
-            return
-        }
-
         setIsLoading(true)
+        setError(undefined)
+
         try {
+            // Extract owner and repo name
+            const [owner, repo] = repoName.split('/')
+
             // Check if repo exists in cache
             const hasCache = await checkRepoCache(`${owner}/${repo}`)
 
@@ -56,8 +65,20 @@ export function AnalyzeForm() {
             // If user is logged in, proceed to analysis
             router.push(`/report/${owner}/${repo}`)
         } catch (error) {
-            setError("Failed to analyze repository")
-            console.error(error)
+            if (error instanceof ValidationError) {
+                setError(error.message)
+            } else if (error instanceof AuthenticationError) {
+                setPendingRepo({
+                    owner: repoName.split('/')[0],
+                    repo: repoName.split('/')[1]
+                })
+                setShowAuthDialog(true)
+            } else if (error instanceof NotFoundError) {
+                setError(error.message)
+            } else {
+                setError("An unexpected error occurred. Please try again later.")
+                console.error(error)
+            }
         } finally {
             setIsLoading(false)
         }
@@ -71,20 +92,25 @@ export function AnalyzeForm() {
                         <Input
                             type="text"
                             value={repoName}
-                            onChange={(e) => setRepoName(e.target.value)}
+                            onChange={handleInputChange}
                             placeholder="Enter GitHub repository name (e.g., owner/repo)"
-                            className="flex-grow"
+                            className={cn("flex-grow", !isValidFormat && "border-destructive")}
                             disabled={isLoading}
                         />
                         <Button
                             type="submit"
-                            disabled={isLoading}
+                            disabled={isLoading || !isValidFormat || !repoName}
                         >
                             Analyze
                         </Button>
                     </div>
                     {error && (
                         <p className="text-sm text-destructive">{error}</p>
+                    )}
+                    {!isValidFormat && repoName && (
+                        <p className="text-sm text-destructive">
+                            Please use the format owner/repo (e.g., vercel/next.js)
+                        </p>
                     )}
                 </div>
             </form>
