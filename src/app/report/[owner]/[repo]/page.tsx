@@ -9,14 +9,14 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { signIn } from "next-auth/react"
 
 interface PageProps {
-    params: {
+    params: Promise<{
         owner: string
         repo: string
-    }
+    }>
 }
 
 export default async function ReportPage({ params }: PageProps) {
-    const { owner, repo } = params
+    const { owner, repo } = await params
     const repoName = `${owner}/${repo}`
 
     const result = await analyzeRepo(repoName)

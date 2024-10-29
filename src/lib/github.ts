@@ -73,14 +73,14 @@ export async function getRepoStats(
 export async function checkRepoExists(repoName: string, token: string): Promise<boolean> {
     const octokit = new Octokit({ auth: token })
     const [owner, repo] = repoName.split('/')
-
     try {
-        await octokit.repos.get({
+
+        const resp = await octokit.rest.repos.get({
             owner,
             repo,
         })
-        return true
-    } catch (error) {
+        return resp.status === 200
+    } catch {
         return false
     }
 }

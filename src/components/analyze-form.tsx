@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { isValidRepoFormat } from "@/lib/utils"
 import { cn } from "@/lib/utils"
-import { ValidationError, AuthenticationError, NotFoundError } from "@/lib/errors"
+import { ValidationError } from "@/lib/errors"
 
 export function AnalyzeForm() {
     const { data: session } = useSession()
@@ -66,14 +66,6 @@ export function AnalyzeForm() {
             router.push(`/report/${owner}/${repo}`)
         } catch (error) {
             if (error instanceof ValidationError) {
-                setError(error.message)
-            } else if (error instanceof AuthenticationError) {
-                setPendingRepo({
-                    owner: repoName.split('/')[0],
-                    repo: repoName.split('/')[1]
-                })
-                setShowAuthDialog(true)
-            } else if (error instanceof NotFoundError) {
                 setError(error.message)
             } else {
                 setError("An unexpected error occurred. Please try again later.")
